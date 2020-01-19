@@ -1,0 +1,83 @@
+import React, { useState, useEffect } from 'react';
+import { Text, View, TouchableOpacity, Image} from 'react-native';
+import { Camera } from 'expo-camera';
+import * as MediaLibrary from 'expo-media-library';
+import {RNS3} from 'react-native-aws3';
+
+export default function App(){
+
+  const [hasPermission, setHasPermission] = useState(null);
+  const [type, setType] = useState(Camera.Constants.Type.back);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
+
+  if (hasPermission === null) {
+    return <View />;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+  const takePicture = async() => {
+    if (this.camera) {
+      const options = { quality: 1, base64: true, };
+      const data = await this.camera.takePictureAsync(options)
+        .then(data => {
+          imgUrl = data.uri;
+          alert('data uri:' + data.uri);
+          console.log(imgUrl);
+          let str = imgUrl.replace(/\//g, "");
+          const file = {
+            uri: imgUrl,
+            name: str + ".jpg",
+            type: "image/jpeg"
+          };
+          const options = {
+            keyPrefix: "images/",
+            bucket: "reacting-cruzhacks",
+            region: "us-east-1",
+            accessKey: "AKIAI42XYLYRDH5LRL4Q",
+            secretKey: "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",
+            successActionStatus: 201
+          };
+          RNS3.put(file,options).then(response => {
+            if (response.status !== 201){
+              throw new Error("Failed to upload image to S3");
+            }
+            alert("Picture uploaded!");
+            console.log(response.body);
+          });
+          //MediaLibrary.saveToLibraryAsync(imgUrl);
+        });
+    }
+    else alert("CAMERA NOT AVAILABLE!");
+  };
+  return (
+    <View style={{ flex: 1 }}>
+      <Camera style={{ flex: 1 }} type={type} ref={ (ref) => {this.camera = ref}} >
+        <View style={{
+            flex: 1,
+            backgroundColor: 'transparent',
+            flexDirection: 'row',
+          }}>
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              alignSelf: 'flex-end',
+              alignItems: 'center',
+            }}
+            onPress={() => {
+              takePicture();
+              //alert("Image taken");
+            }}>
+            <Text style={{ fontSize: 20, marginBottom: 20, color: 'white', backgroundColor:'black' }}> Take Picture </Text>
+          </TouchableOpacity>
+        </View>
+      </Camera>
+    </View>
+  );
+}
