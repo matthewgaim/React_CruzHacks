@@ -4,7 +4,7 @@ import { Camera } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import {RNS3} from 'react-native-aws3';
 import { hide } from 'expo/build/launch/SplashScreen';
-import test from './test';
+import creds from './creds';
 
 export default function App(){
 
@@ -37,15 +37,15 @@ export default function App(){
             name: str + ".jpg",
             type: "image/jpeg"
           };
-          const options = {
-            keyPrefix: "images/",
-            bucket: "reacting-cruzhacks",
-            region: "us-east-1",
-            accessKey: "AKIAI7A4EU2LU3DYTC7A",
-            secretKey: "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",
-            successActionStatus: 201
-          };
-          RNS3.put(file,options).then(response => {
+          // const options = {
+          //   keyPrefix: "images/",
+          //   bucket: "reacting-cruzhacks",
+          //   region: "us-east-1",
+          //   accessKey: "AKIAI7A4EU2LU3DYTC7A",
+          //   secretKey: "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",
+          //   successActionStatus: 201
+          // };
+          RNS3.put(file,creds).then(response => {
             if (response.status !== 201){
               throw new Error("Failed to upload image to S3");
             }
