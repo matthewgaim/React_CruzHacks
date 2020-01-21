@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, Image} from 'react-native';
+import React, { useState, useEffect, Component } from 'react';
+import { Text, View, TouchableOpacity, Image, StyleSheet} from 'react-native';
 import { Camera } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import {RNS3} from 'react-native-aws3';
+import { hide } from 'expo/build/launch/SplashScreen';
+import test from './test';
 
 export default function App(){
 
   const [hasPermission, setHasPermission] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
-
   useEffect(() => {
     (async () => {
       const { status } = await Camera.requestPermissionsAsync();
@@ -24,7 +25,7 @@ export default function App(){
   }
   const takePicture = async() => {
     if (this.camera) {
-      const options = { quality: 1, base64: true, };
+      const options = { quality: 0.5, base64: true, };
       const data = await this.camera.takePictureAsync(options)
         .then(data => {
           imgUrl = data.uri;
@@ -40,8 +41,8 @@ export default function App(){
             keyPrefix: "images/",
             bucket: "reacting-cruzhacks",
             region: "us-east-1",
-            accessKey: "AKIAI42XYLYRDH5LRL4Q",
-            secretKey: "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",
+            accessKey: "AKIAI7A4EU2LU3DYTC7A",
+            secretKey: "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",
             successActionStatus: 201
           };
           RNS3.put(file,options).then(response => {
@@ -56,9 +57,10 @@ export default function App(){
     }
     else alert("CAMERA NOT AVAILABLE!");
   };
+
   return (
     <View style={{ flex: 1 }}>
-      <Camera style={{ flex: 1 }} type={type} ref={ (ref) => {this.camera = ref}} >
+      <Camera style={{flex: 1}} type={type} ref={ (ref) => {this.camera = ref}} >
         <View style={{
             flex: 1,
             backgroundColor: 'transparent',
@@ -72,9 +74,8 @@ export default function App(){
             }}
             onPress={() => {
               takePicture();
-              //alert("Image taken");
             }}>
-            <Text style={{ fontSize: 20, marginBottom: 20, color: 'white', backgroundColor:'black' }}> Take Picture </Text>
+            <Image style = {{marginBottom: 20, width: 100, height: 100}}source={{uri: "https://dezov.s3.amazonaws.com/media/white-circle-png194-4049-8e22-a9fe231d010c.png"}}></Image>
           </TouchableOpacity>
         </View>
       </Camera>
